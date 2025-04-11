@@ -7,7 +7,7 @@ from alpaca.trading.client import TradingClient
 from alpaca.data.requests import CryptoBarsRequest, StockBarsRequest, OptionBarsRequest
 from alpaca.trading.models import Asset
 from alpaca.trading.enums import AssetClass
-from alpaca.data.enums import DataFeed
+#from alpaca.data.enums import DataFeed
 
 
 
@@ -25,6 +25,14 @@ class Client:
             self.option_client=OptionHistoricalDataClient(API_KEY,SECRET_KEY)
         else:
             raise InvalidKey("Your API_KEY or SECRET_KEY is invalid or undetermined")
+        
+
+    def get_client_status(self):
+        return dict(filter(lambda item: item[0] in ['status','crypto_status','options_buying_power'],dict(self.client.get_account()).items()))
+   
+    
+    def get_client_positions(self):
+        return [dict(filter(lambda item: item[0] in ['symbol','qty','avg_entry_price','current_price'],dict(position).items())) for position in self.client.get_all_positions()]
 
 
     def get_data(self, uuid: Asset, start_time, end_time, data_time_frame):
@@ -70,3 +78,4 @@ class Client:
         latest_trade = get_news(local_request_params)
 
         return dict(filter(lambda item: item[0] in ['timestamp', 'price'],dict(latest_trade[uuid]).items())) 
+    

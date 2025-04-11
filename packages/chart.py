@@ -59,17 +59,31 @@ class Chart:
     def pop_instrument(self,uuid):
         self.instruments.pop(uuid)
 
-    #To be changed with stream of data
+
+    #To be changed with stream of data!!!
     def reload_instruments(self):
-        for ins in self.instruments:
+        for uuid in self.instruments:
             utc_m4 = timezone(timedelta(hours=-4))
-            data = self.client.get_data("SPY",datetime.now(utc_m4)-timedelta(days=2),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Day)[0]
+            data = self.client.get_data(uuid,datetime.now(utc_m4)-timedelta(days=2),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Day)[0]
             
             data_dict=dict()
             data_dict['timestamp']=data['timestamp']
             data_dict['price']=data['close']
             data_dict['change']=data['close']/data['open']-1
-            self.instruments[ins]=data_dict   
+
+            self.instruments[uuid]=data_dict   
+    
+
+    def reload_instrument(self, uuid):
+        utc_m4 = timezone(timedelta(hours=-4))
+        data = self.client.get_data(uuid,datetime.now(utc_m4)-timedelta(days=2),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Day)[0]
+        
+        data_dict=dict()
+        data_dict['timestamp']=data['timestamp']
+        data_dict['price']=data['close']
+        data_dict['change']=data['close']/data['open']-1
+
+        self.instruments[uuid]=data_dict    
 
     
     def get_instruments_data(self):

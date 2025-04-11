@@ -9,6 +9,7 @@ def print_dict(dict):
 
 def main():
     client = Client()
+    chart = Chart()
     utc_m4 = timezone(timedelta(hours=-4))
 
     # data = client.get_data("SPY",datetime.now(utc_m4)-timedelta(weeks=1),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Hour)
@@ -20,20 +21,23 @@ def main():
     # data = client.get_newest_data("SPY")
     # print(data)
 
-    chart = Chart()
-    chart.update(uuid='SPY')
-    chart.reload()
+    #print(client.get_client_status())
+
+    #print(client.get_client_positions())
+
+    # chart.update(uuid='SPY')
+    # chart.reload()
     #print(chart.get_params())
 
     #print_dict(chart.get_data())
 
-    print(chart.get_instruments_data())
-    chart.add_instrument('SPY')
-    print(chart.get_instruments_data())
-    chart.add_instrument('AAPL')
-    print(chart.get_instruments_data())
-    chart.reload_instruments()
-    print(chart.get_instruments_data())
+    # print(chart.get_instruments_data())
+    # chart.add_instrument('SPY')
+    # print(chart.get_instruments_data())
+    # chart.add_instrument('AAPL')
+    # print(chart.get_instruments_data())
+    # chart.reload_instruments()
+    # print(chart.get_instruments_data())
 
 if __name__ == "__main__":
     main()
