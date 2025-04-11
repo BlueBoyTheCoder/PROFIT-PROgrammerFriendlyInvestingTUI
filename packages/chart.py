@@ -1,19 +1,21 @@
 from alpaca.data.timeframe import TimeFrame
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from client import Client
 
 
+
 class Chart:
-    def __init__(self, uuid=0, instrument=None, time_frame=1, height=15, width=60, start_date=datetime.now()-timedelta(weeks=1), end_date=datetime.now()-timedelta(hours=5)):
+    def __init__(self, uuid=0, time_frame=30, height=15, width=60, start_date=datetime.now()-timedelta(weeks=1), end_date=datetime.now()-timedelta(hours=5)):
         self.data=None
+        self.instruments=dict()
         self.client=Client()
         self.uuid = uuid
-        self.instrument = instrument
         self.time_frame = time_frame #minutes (time per one char. Ex: time_frame=3 and width=15 then timespan=3*15=45 minutes on 15 char of width)
         self.height = height
         self.width = width
         self.start_date = start_date
         self.end_date = end_date
+
 
     def reload(self):
         data_time_frame=TimeFrame.Minute
@@ -28,18 +30,48 @@ class Chart:
       
         self.data = self.client.get_data(self.uuid, self.start_date, self.end_date, data_time_frame)
 
-    def update(self, uuid=False, instrument=False, time_frame=False, height=False, width=False, start_date=False, end_date=False):
+
+    def update(self, uuid=False, time_frame=False, height=False, width=False, start_date=False, end_date=False):
         if uuid: self.uuid = uuid
-        if instrument: self.instrument = instrument
         if time_frame: self.time_frame = time_frame
         if height: self.height = height
         if width: self.width = width
         if start_date: self.start_date
         if end_date: self.end_date
 
+
     def get_params(self):
-        return dict(uuid=self.uuid,instrument=self.instrument,time_frame=self.time_frame,height=self.height,width=self.width)
+        return dict(uuid=self.uuid,time_frame=self.time_frame,height=self.height,width=self.width)
   
+
     def get_data(self):
         return self.data
+    
+
+    def get_newest_data(self):
+        return self.client.get_newest_data(self.uuid)
+    
+
+    def add_instrument(self,uuid):
+        self.instruments[uuid]=None
+
+    
+    def pop_instrument(self,uuid):
+        self.instruments.pop(uuid)
+
+    #To be changed with stream of data
+    def reload_instruments(self):
+        for ins in self.instruments:
+            utc_m4 = timezone(timedelta(hours=-4))
+            data = self.client.get_data("SPY",datetime.now(utc_m4)-timedelta(days=2),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Day)[0]
+            
+            data_dict=dict()
+            data_dict['timestamp']=data['timestamp']
+            data_dict['price']=data['close']
+            data_dict['change']=data['close']/data['open']-1
+            self.instruments[ins]=data_dict   
+
+    
+    def get_instruments_data(self):
+        return self.instruments
   
