@@ -6,9 +6,9 @@ from client import Client
 
 class Chart:
     def __init__(self, uuid=0, time_frame=30, height=15, width=60, start_date=datetime.now()-timedelta(weeks=1), end_date=datetime.now()-timedelta(hours=5)):
-        self.data=None
-        self.instruments=dict()
-        self.client=Client()
+        self.data = None
+        self.instruments = dict()
+        self.client = Client()
         self.uuid = uuid
         self.time_frame = time_frame #minutes (time per one char. Ex: time_frame=3 and width=15 then timespan=3*15=45 minutes on 15 char of width)
         self.height = height
@@ -23,12 +23,12 @@ class Chart:
             data_time_frame=TimeFrame.Hour
         elif self.time_frame>=60*12:
             data_time_frame=TimeFrame.Day
-        elif self.time_frame>=60*24*3.5:
+        elif self.time_frame>=60*24*7/2:
             data_time_frame=TimeFrame.Week
         elif self.time_frame>=60*24*7*15:
             data_time_frame=TimeFrame.Month
       
-        self.data = self.client.get_data(self.uuid, self.start_date, self.end_date, data_time_frame)
+        self.data = self.client.get_historical_data(self.uuid, self.start_date, self.end_date, data_time_frame)
 
 
     def update(self, uuid=False, time_frame=False, height=False, width=False, start_date=False, end_date=False):
@@ -64,7 +64,7 @@ class Chart:
     def reload_instruments(self):
         for uuid in self.instruments:
             utc_m4 = timezone(timedelta(hours=-4))
-            data = self.client.get_data(uuid,datetime.now(utc_m4)-timedelta(days=2),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Day)[0]
+            data = self.client.get_historical_data(uuid,datetime.now(utc_m4)-timedelta(days=2),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Day)[0]
             
             data_dict=dict()
             data_dict['timestamp']=data['timestamp']
