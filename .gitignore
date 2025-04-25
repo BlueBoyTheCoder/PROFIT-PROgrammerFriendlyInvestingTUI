@@ -3,3 +3,4 @@ test_scripts
 __pycache__
 PASSWORD.py
 t.py
+display_copy.py

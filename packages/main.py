@@ -1,8 +1,12 @@
 from client import Client
 from chart import Chart
+from orders import Orders
+from widget import Widget
 from alpaca.data.timeframe import TimeFrame
+from alpaca.trading.enums import OrderSide, TimeInForce, OrderType
 from datetime import datetime, timedelta, timezone
 from exceptions import *
+from alpaca.common.exceptions import APIError
 
 
 
@@ -53,6 +57,35 @@ def main():
     print(chart.get_instruments_data())
     chart.reload_instruments()
     print_dict(chart.get_instruments_data())
+
+    orders = Orders(client.get_trading_client())
+    orders.update_order(symbol="SPY")
+    orders.submit_order()
+    orders.update_order(symbol="AAPL",qty=3,side=OrderSide.SELL)
+    try:
+        # Code that might raise an error
+        orders.submit_order()
+    except APIError as err:
+    # Handle the error
+        print(err.message)
+
+
+    w=Widget(['AAPL','SPY','AAA'])
+    print(w.instruments)
+    w.add_instrument('B')
+    print(w.instruments)
+    w.add_instrument(['C'])
+    print(w.instruments)
+    w.pop_instrument(['B','AAA','C'])
+    print(w.instruments)
+    w.reload_instruments()
+    print(w.instruments)
+    import time
+    for i in range(10):
+        time.sleep(1)
+        w.reload_instruments()
+        print(w.instruments)
+
 
 if __name__ == "__main__":
     main()
