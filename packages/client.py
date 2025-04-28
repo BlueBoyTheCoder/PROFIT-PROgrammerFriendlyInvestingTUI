@@ -15,14 +15,14 @@ class Client:
     def __init__(self, api_key=None, secret_key=None, paper=True):
         if api_key and secret_key:
             self.client = TradingClient(api_key,secret_key, paper=paper)
-            self.crypto_client=CryptoHistoricalDataClient(api_key,secret_key)
-            self.stock_client=StockHistoricalDataClient(api_key,secret_key)
-            self.option_client=OptionHistoricalDataClient(api_key,secret_key)
+            self.crypto_client = CryptoHistoricalDataClient(api_key,secret_key)
+            self.stock_client = StockHistoricalDataClient(api_key,secret_key)
+            self.option_client = OptionHistoricalDataClient(api_key,secret_key)
         elif not api_key and not secret_key:
             self.client = TradingClient(API_KEY,SECRET_KEY, paper=paper)
-            self.crypto_client=CryptoHistoricalDataClient(API_KEY,SECRET_KEY)
-            self.stock_client=StockHistoricalDataClient(API_KEY,SECRET_KEY)
-            self.option_client=OptionHistoricalDataClient(API_KEY,SECRET_KEY)
+            self.crypto_client = CryptoHistoricalDataClient(API_KEY,SECRET_KEY)
+            self.stock_client = StockHistoricalDataClient(API_KEY,SECRET_KEY)
+            self.option_client = OptionHistoricalDataClient(API_KEY,SECRET_KEY)
         else:
             raise InvalidKey("Your API_KEY or SECRET_KEY is invalid or undetermined")
         
@@ -93,24 +93,6 @@ class Client:
             
 
     def get_newest_data(self, uuid: Asset | str):
-        # if self.client.get_asset(uuid).asset_class == AssetClass.CRYPTO:
-        #     get_news = self.crypto_client.get_crypto_latest_trade
-        #     local_request = CryptoLatestTradeRequest
-        # elif self.client.get_asset(uuid).asset_class == AssetClass.US_EQUITY:
-        #     get_news = self.stock_client.get_stock_latest_trade
-        #     local_request = OptionLatestTradeRequest
-        # elif self.client.get_asset(uuid).asset_class == AssetClass.US_OPTION:
-        #     get_news = self.option_client.get_option_latest_trade
-        #     local_request = StockLatestTradeRequest
-        # else:
-        #     raise InvalidAssetClass()
-
-        # local_request_params = local_request(symbol_or_symbols=uuid)
-
-        # latest_trade = get_news(local_request_params)
-
-        # return dict(filter(lambda item: item[0] in ['timestamp', 'price'],dict(latest_trade[uuid]).items()))
-
         data = yf.download(uuid, period="1d", interval="1d", progress=False, auto_adjust=True)
 
         data = data.reset_index()

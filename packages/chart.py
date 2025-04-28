@@ -18,15 +18,15 @@ class Chart:
 
 
     def reload(self):
-        data_time_frame=TimeFrame.Minute
-        if self.time_frame>=30:
-            data_time_frame=TimeFrame.Hour
-        elif self.time_frame>=60*12:
+        data_time_frame = TimeFrame.Minute
+        if self.time_frame >= 30:
+            data_time_frame = TimeFrame.Hour
+        elif self.time_frame >= 60*12:
             data_time_frame=TimeFrame.Day
-        elif self.time_frame>=60*24*7/2:
-            data_time_frame=TimeFrame.Week
-        elif self.time_frame>=60*24*7*15:
-            data_time_frame=TimeFrame.Month
+        elif self.time_frame >= 60*24*7/2:
+            data_time_frame = TimeFrame.Week
+        elif self.time_frame >= 60*24*7*15:
+            data_time_frame = TimeFrame.Month
       
         self.data = self.client.get_historical_data(self.uuid, self.start_date, self.end_date, data_time_frame)
 
@@ -53,7 +53,7 @@ class Chart:
     
 
     def add_instrument(self,uuid):
-        self.instruments[uuid]=None
+        self.instruments[uuid] = None
 
     
     def pop_instrument(self,uuid):
@@ -67,11 +67,11 @@ class Chart:
             data = self.client.get_historical_data(uuid,datetime.now(utc_m4)-timedelta(days=2),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Day)[0]
             
             data_dict=dict()
-            data_dict['timestamp']=data['timestamp']
-            data_dict['price']=data['close']
-            data_dict['change']=data['close']/data['open']-1
+            data_dict['timestamp'] = data['timestamp']
+            data_dict['price'] = data['close']
+            data_dict['change'] = data['close']/data['open']-1
 
-            self.instruments[uuid]=data_dict   
+            self.instruments[uuid] = data_dict   
     
 
     def reload_instrument(self, uuid):
@@ -79,11 +79,11 @@ class Chart:
         data = self.client.get_data(uuid,datetime.now(utc_m4)-timedelta(days=2),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Day)[0]
         
         data_dict=dict()
-        data_dict['timestamp']=data['timestamp']
-        data_dict['price']=data['close']
-        data_dict['change']=data['close']/data['open']-1
+        data_dict['timestamp'] = data['timestamp']
+        data_dict['price'] = data['close']
+        data_dict['change'] = data['close']/data['open']-1
 
-        self.instruments[uuid]=data_dict    
+        self.instruments[uuid] = data_dict    
 
     
     def get_instruments_data(self):

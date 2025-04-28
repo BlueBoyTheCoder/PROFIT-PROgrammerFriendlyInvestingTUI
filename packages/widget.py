@@ -20,12 +20,12 @@ class Widget:
 
     
     def pop_instrument(self,instruments_uuid: str | list):
-        if type(instruments_uuid)==str: self.instruments.pop(instruments_uuid)
+        if type(instruments_uuid)==str: 
+            self.instruments.pop(instruments_uuid)
         elif type(instruments_uuid)==list: 
             for inst in instruments_uuid: self.instruments.pop(inst)
 
 
-    #To be changed with stream of data!!!
     def reload_instruments(self):
         for uuid in self.instruments:
             data = self.client.get_newest_data(uuid)[0]
@@ -50,6 +50,7 @@ class Widget:
     def get_instruments_data(self):
         return self.instruments
     
+
     def get_widget_patch(self, max_length):
         self.reload_instruments()
         whole_patch=[]

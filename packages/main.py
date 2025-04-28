@@ -23,13 +23,13 @@ def main():
         for d in dic:
             print(d, dic[d])
 
-    print(dict(client.client.get_asset("SPY"))['name'])
+    # print(dict(client.client.get_asset("SPY"))['name'])
 
-    data = client.get_historical_data("AAPL",datetime.now(utc_m4)-timedelta(days=10),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Hour)
-    print_list(data)
+    # data = client.get_historical_data("AAPL",datetime.now(utc_m4)-timedelta(days=10),datetime.now(utc_m4)-timedelta(days=1),TimeFrame.Hour)
+    # print_list(data)
 
-    data = client.get_historical_data("SPY",datetime.now(utc_m4)-timedelta(hours=11),datetime.now(utc_m4)-timedelta(hours=10),TimeFrame.Minute)
-    print_list(data)
+    # data = client.get_historical_data("SPY",datetime.now(utc_m4)-timedelta(hours=25),datetime.now(utc_m4)-timedelta(hours=24),TimeFrame.Minute)
+    # print_list(data)
 
     data = client.get_lastday_data("AAPL")
     print_list(data)
@@ -40,34 +40,32 @@ def main():
     data = client.get_newest_data("SPY")
     print(data)
 
-    print(client.get_client_status())
+    # print(client.get_client_status())
 
-    print(client.get_client_positions())
+    # print(client.get_client_positions())
 
-    chart.update(uuid='SPY')
-    chart.reload()
-    print(chart.get_params())
+    # chart.update(uuid='SPY')
+    # chart.reload()
+    # print(chart.get_params())
 
-    print_list(chart.get_data())
+    # print_list(chart.get_data())
 
-    print(chart.get_instruments_data())
-    chart.add_instrument('SPY')
-    print(chart.get_instruments_data())
-    chart.add_instrument('AAPL')
-    print(chart.get_instruments_data())
-    chart.reload_instruments()
-    print_dict(chart.get_instruments_data())
+    # print(chart.get_instruments_data())
+    # chart.add_instrument('SPY')
+    # print(chart.get_instruments_data())
+    # chart.add_instrument('AAPL')
+    # print(chart.get_instruments_data())
+    # chart.reload_instruments()
+    # print_dict(chart.get_instruments_data())
 
-    orders = Orders(client.get_trading_client())
-    orders.update_order(symbol="SPY")
-    orders.submit_order()
-    orders.update_order(symbol="AAPL",qty=3,side=OrderSide.SELL)
-    try:
-        # Code that might raise an error
-        orders.submit_order()
-    except APIError as err:
-    # Handle the error
-        print(err.message)
+    # orders = Orders(client.get_trading_client())
+    # orders.update_order(symbol="SPY")
+    # orders.submit_order()
+    # orders.update_order(symbol="AAPL",qty=3,side=OrderSide.SELL)
+    # try:
+    #     orders.submit_order()
+    # except APIError as err:
+    #     print(err.message)
 
 
     w=Widget(['AAPL','SPY','AAA'])
@@ -81,7 +79,7 @@ def main():
     w.reload_instruments()
     print(w.instruments)
     import time
-    for i in range(10):
+    for i in range(8):
         time.sleep(1)
         w.reload_instruments()
         print(w.instruments)
