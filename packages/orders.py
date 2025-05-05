@@ -79,10 +79,12 @@ class Orders:
 
     def submit_stop_limit_order(self):
         order_request = StopLimitOrderRequest(
+                            type=OrderType.STOP_LIMIT,
                             symbol=self.symbol,
                             qty=self.qty,
                             side=self.side,
-                            stop_limit_price=self.price,
+                            stop_price=self.price,
+                            limit_price=self.price,
                             time_in_force=self.time_in_force)
         try:
             order = self.trading_client.submit_order(order_request)
@@ -97,10 +99,10 @@ class Orders:
     def submit_order(self):
         match self.type:
             case OrderType.MARKET:
-                self.submit_market_order()
+                return self.submit_market_order()
             case OrderType.STOP:
-                self.submit_stop_order()
+                return self.submit_stop_order()
             case OrderType.LIMIT:
-                self.submit_limit_order()
+                return self.submit_limit_order()
             case OrderType.STOP_LIMIT:
-                self.submit_stop_limit_order()
+                return self.submit_stop_limit_order()

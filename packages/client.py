@@ -65,6 +65,14 @@ class Client:
     
 
     def get_lastday_data(self, uuid: Asset | str):
+        right_formats={
+            ('datetime',''): 'timestamp',
+            ('Open',uuid): 'open',
+            ('High',uuid): 'high',
+            ('Low',uuid): 'low',
+            ('Close',uuid): 'close'
+        }
+
         data = yf.download(uuid, period="1d", interval="5m", progress=False, auto_adjust=True)
 
         data = data.reset_index()
@@ -76,16 +84,9 @@ class Client:
             d[('datetime','')] = d[('datetime','')].to_pydatetime()
 
         for d in data:
-            if ('datetime','') in d:
-                d['timestamp'] = d.pop(('datetime',''))
-            if ('Open',uuid) in d:
-                d['open'] = d.pop(('Open',uuid))
-            if ('High',uuid) in d:
-                d['high'] = d.pop(('High',uuid))
-            if ('Low',uuid) in d:
-                d['low'] = d.pop(('Low',uuid))
-            if ('Close',uuid) in d:
-                d['close'] = d.pop(('Close',uuid))
+            for right_format in right_formats:
+                if right_format in d:
+                    d[right_formats[right_format]]=d.pop(right_format)
             if ('Volume',uuid) in d:
                 d.pop(('Volume',uuid))
 
@@ -93,27 +94,28 @@ class Client:
             
 
     def get_newest_data(self, uuid: Asset | str):
+        right_formats={
+            ('datetime',''): 'timestamp',
+            ('Open',uuid): 'open',
+            ('High',uuid): 'high',
+            ('Low',uuid): 'low',
+            ('Close',uuid): 'close'
+        }
+
         data = yf.download(uuid, period="1d", interval="1d", progress=False, auto_adjust=True)
 
         data = data.reset_index()
         data = data.rename(columns={"Datetime": "datetime", "Date": "datetime"})
         data = data.to_dict(orient="records")
+        d=data[0]
 
-        for d in data:
-            d[('datetime','')] = d[('datetime','')].to_pydatetime()
+        d[('datetime','')] = d[('datetime','')].to_pydatetime()
 
-        for d in data:
-            if ('datetime','') in d:
-                d['timestamp'] = d.pop(('datetime',''))
-            if ('Open',uuid) in d:
-                d['open'] = d.pop(('Open',uuid))
-            if ('High',uuid) in d:
-                d['high'] = d.pop(('High',uuid))
-            if ('Low',uuid) in d:
-                d['low'] = d.pop(('Low',uuid))
-            if ('Close',uuid) in d:
-                d['close'] = d.pop(('Close',uuid))
-            if ('Volume',uuid) in d:
-                d.pop(('Volume',uuid))
+        for right_format in right_formats:
+            if right_format in d:
+                d[right_formats[right_format]]=d.pop(right_format)
+        if ('Volume',uuid) in d:
+            d.pop(('Volume',uuid))
+                
 
         return data

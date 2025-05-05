@@ -1,13 +1,48 @@
 {
     "widget": 
         {  
-            "uuid": ["AAPL","SPY","GOOGL"]
+            "uuid": ["AAPL","SPY","GOOGL","TSLA","META","NVDA","V"]
         },
     "menu": 
         {
-            "menu": ["CLIENT INFO","SETTINGS","BUY/SELL","OPEN POSITIONS"], 
-            "order": ["SYMBOL","QUANTITY","ORDER SIDE","ORDER TYPE","TIME IN FORCE","PRICE"],
-            "settings": ["S1","S2","S3","S4","S5","S6"],
-            "open positions": ["a"]
+            "menu_parts":
+            {
+                "CLIENT INFO": ["a","b"],
+                "SETTINGS": ["S1","S2","S3","S4","S5","S6"],
+                "BUY/SELL": ["SYMBOL","QUANTITY","ORDER SIDE","ORDER TYPE","TIME IN FORCE","PRICE"],
+                "OPEN POSITIONS": ["a","b"]
+            },
+
+            "menu_buttons":
+            {
+                "CLIENT INFO": 
+                {
+                    "a": "type",
+                    "b": "type"
+                },
+                "SETTINGS":
+                {
+                    "S1": "type",
+                    "S2": "type",
+                    "S3": "type",
+                    "S4": "type",
+                    "S5": "type",
+                    "S6": "type"
+                },
+                "BUY/SELL": 
+                {
+                    "SYMBOL": "type",
+                    "QUANTITY": "type",
+                    "ORDER SIDE": ["BUY", "SELL"],
+                    "ORDER TYPE":["MARKET", "LIMIT", "STOP", "STOP_LIMIT"],
+                    "TIME IN FORCE":["DAY","GTC","OPG","CLS","IOC","FOK"],
+                    "PRICE": "type"
+                },
+                "OPEN POSITIONS":
+                {
+                    "a": "type",
+                    "b": "type"
+                }
+            }
         }
 }
