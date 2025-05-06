@@ -103,7 +103,6 @@ class Client:
         }
 
         data = yf.download(uuid, period="1d", interval="1d", progress=False, auto_adjust=True)
-
         data = data.reset_index()
         data = data.rename(columns={"Datetime": "datetime", "Date": "datetime"})
         data = data.to_dict(orient="records")

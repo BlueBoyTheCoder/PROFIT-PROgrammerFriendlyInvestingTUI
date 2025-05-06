@@ -2,6 +2,7 @@ import curses
 from menu import Menu
 from alpaca.trading.enums import OrderSide, TimeInForce, OrderType
 from exceptions import InvalidOrderData
+from time import sleep
 
 
 def draw_block_border(stdscr, y, x, height, width, name=None):
@@ -36,6 +37,7 @@ def get_market_data_async(widget, widget_setup, result: list):
             result.pop()
         for patch in whole_patch:
             result.append(patch)
+        sleep(5)
 
 
 def draw_market_data(stdscr, y, x, width, result):

@@ -8,6 +8,7 @@ from alpaca.trading.enums import OrderSide, TimeInForce, OrderType
 from datetime import datetime, timedelta, timezone
 from exceptions import *
 from alpaca.common.exceptions import APIError
+from chartdisplay import ChartDisplay
 
 
 
@@ -47,19 +48,13 @@ def main():
 
     # print(client.get_client_positions())
 
-    # chart.update(uuid='SPY')
+    # chart.update(uuid='SPY',time_frame=60)
     # chart.reload()
     # print(chart.get_params())
 
     # print_list(chart.get_data())
 
-    # print(chart.get_instruments_data())
-    # chart.add_instrument('SPY')
-    # print(chart.get_instruments_data())
-    # chart.add_instrument('AAPL')
-    # print(chart.get_instruments_data())
-    # chart.reload_instruments()
-    # print_dict(chart.get_instruments_data())
+    
 
     # orders = Orders(client.get_trading_client())
     # orders.update_order(symbol="SPY")
@@ -146,6 +141,29 @@ def main():
     # print(menu.next_part())
     # pr()
 
+
+    # chartdisplay=ChartDisplay(uuid="AAPL",time_frame=60,start_date=datetime.now()-timedelta(hours=640), end_date=datetime.now()-timedelta(hours=460),height=45, width=180)
+    # chartdisplay.create_chart()
+    # chartdisplay.print_chart()
+    # print()
+    # chartdisplay=ChartDisplay(uuid="AAPL",time_frame=120,start_date=datetime.now()-timedelta(hours=560), end_date=datetime.now()-timedelta(hours=100),height=120, width=115)
+    # chartdisplay.create_chart()
+    # chartdisplay.print_chart()
+    # print()
+    # chartdisplay=ChartDisplay(uuid="AAPL",time_frame=240,start_date=datetime.now()-timedelta(hours=560), end_date=datetime.now()-timedelta(hours=100),height=120, width=115)
+    # chartdisplay.create_chart()
+    # chartdisplay.print_chart()
+
+
+    # print(client.get_lastday_data("AAPL"))
+
+    # for i in client.get_historical_data(uuid="AAPL",start_time=datetime.now()-timedelta(hours=40), end_time=datetime.now()-timedelta(hours=10),data_time_frame=TimeFrame.Minute):
+    #     print(i)
+
+
+
+    chartdisplay=ChartDisplay(uuid="AAPL",time_frame=1920,start_date=datetime.now()-timedelta(hours=100+24*180), end_date=datetime.now()-timedelta(hours=100),height=45, width=180)
+    chartdisplay.create_chart()
 
 
 

@@ -2,11 +2,13 @@ import curses
 from display_texts import *
 from widget import Widget
 from chart import Chart
+from chartdisplay import ChartDisplay
 from client import Client
 from menu import Menu
 from orders import Orders
 import json
 import threading, time
+from datetime import datetime, timedelta
 from displayer import *
 
 
@@ -32,6 +34,7 @@ def draw_logging_menu(stdscr):
             stdscr.addstr(y_profit + i, x_profit, PROFIT[i])
 
         draw_loading(stdscr,y_profit+len(PROFIT)+2, width//2)
+
 
         stdscr.refresh()
 
