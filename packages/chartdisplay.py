@@ -5,26 +5,44 @@ import time
 
 
 class ChartDisplay(Chart):
-    def __init__(self, uuid=0, time_frame=30, height=15, width=60, start_date=datetime.now()-timedelta(weeks=1), end_date=datetime.now()-timedelta(hours=5), start_price=100, end_price=300):
-        super().__init__(uuid, time_frame, height, width, start_date, end_date)
+    def __init__(self, uuid=0, time_frame=30, height=15, width=60, start_date=None, end_date=None, start_price=100, end_price=300):
         self.chart=None
+        self.chart_available=True
         self.place_for_data=4
         self.place_for_price=7
         self.start_price=start_price
         self.end_price=end_price
+        ###bez if ustalić wcześńiej
+        # if start_date is None:
+        #     super().__init__(uuid, time_frame, height, width, datetime.now()-timedelta(minutes=time_frame*(width-self.place_for_price)), datetime.now())
+        # else:
+        super().__init__(uuid, time_frame, height, width, start_date, end_date)
+        
 
     def update(self, uuid=False, time_frame=False, height=False, width=False, start_date=False, end_date=False):
-        super().update(uuid, time_frame, height, width, start_date, end_date)
-        self.start_date=start_date
+        # super().update(uuid, time_frame, height, width, start_date, end_date)
+        # self.start_date=start_date
+
+        if uuid: 
+            self.uuid = uuid
+        if time_frame: 
+            self.time_frame = time_frame
+        if height: 
+            self.height = height
+        if width: 
+            self.width = width
+        if start_date: 
+            self.start_date = start_date
+        if end_date: 
+            self.end_date = end_date
+        
 
 
     
     def create_chart(self):
-        self.chart=[dict() for _ in range(self.width-self.place_for_price)]
+        chart=[dict() for _ in range(self.width-self.place_for_price)]
         
         self.reload()
-        price_max=-float("inf")
-        price_min=float("inf")
         price=[]
 
         for d in self.data:
@@ -33,16 +51,13 @@ class ChartDisplay(Chart):
             else:
                 price.append((d['open'],d['close'],d['timestamp'],1))
             
-            price_max=max(price_max,max(d["open"],d["close"]))
-            price_min=min(price_min,min(d["open"],d["close"]))
+
 
         price_max=self.end_price
         price_min=self.start_price
         price_delta=price_max-price_min
-        #price_max+=price_delta/10
-        #price_min-=price_delta/10
-        price_delta=price_max-price_min
-        price_step=price_delta/(self.height-self.place_for_data)##########################################
+
+        price_step=price_delta/(self.height-self.place_for_data)
 
         date=price[0][2]
         date=self.start_date
@@ -50,6 +65,8 @@ class ChartDisplay(Chart):
 
         subparts=0
 
+
+        # enum
         match self.time_frame:
             case 15:
                 subparts=15
@@ -130,32 +147,27 @@ class ChartDisplay(Chart):
                     i_+=1
             
             if start!=float("inf"):
-                self.chart[i//subparts]["start"]=min(start,end)
-                self.chart[i//subparts]["length"]=max(1,abs(end-start))
+                chart[i//subparts]["start"]=min(start,end)
+                chart[i//subparts]["length"]=max(1,abs(end-start))
                 if price_start<price_end:
-                    self.chart[i//subparts]["direction"]=1
+                    chart[i//subparts]["direction"]=1
                 else:
-                    self.chart[i//subparts]["direction"]=-1
+                    chart[i//subparts]["direction"]=-1
             else:
 
-                self.chart[i//subparts]["start"]=0
-                self.chart[i//subparts]["length"]=0
-                self.chart[i//subparts]["direction"]=1
-            self.chart[i//subparts]["date"]=date+i*time_step
+                chart[i//subparts]["start"]=0
+                chart[i//subparts]["length"]=0
+                chart[i//subparts]["direction"]=1
+                
+            chart[i//subparts]["date"]=date+i*time_step    
 
-        #     if (i//subparts)%10==0:
-        #         print(self.chart[i//subparts])
-        # time.sleep(2)
-            
-        
-
-
-
-
+        self.chart_available=False
+        self.chart=chart
+        self.chart_available=True     
     
 
     def print_chart(self):
-        if self.chart==None:
+        if self.chart==None or self.chart_available==False:
             print("NO CHART")
         else:
             for ch in self.chart:
@@ -163,7 +175,7 @@ class ChartDisplay(Chart):
     
 
     def display_chart(self, stdscr, y, x):
-        if self.chart == None:
+        if self.chart==None or self.chart_available == False:
             return -1
         else:
             for i, ch in enumerate(self.chart):
@@ -186,7 +198,7 @@ class ChartDisplay(Chart):
                 delta_price=(self.end_price-self.start_price)/(self.height-self.place_for_data)
                 if i%10==0:
                     stdscr.addstr(y+self.height-i-self.place_for_data, x+self.width-self.place_for_price, "-") 
-                    stdscr.addstr(y+self.height-i-self.place_for_data, x+self.width-self.place_for_price+1, str(round(self.start_price+delta_price*i,1))) 
+                    stdscr.addstr(y+self.height-i-self.place_for_data, x+self.width-self.place_for_price+2, str(round(self.start_price+delta_price*i,1))) 
         stdscr.refresh()
 
 
@@ -207,10 +219,8 @@ class ChartDisplay(Chart):
 
     def date_up(self, factor=0.25):
         delta_date=self.end_date-self.start_date
-        print(self.start_date)
         self.start_date+=delta_date*factor
         self.end_date+=delta_date*factor
-        print(self.start_date)
 
     def date_down(self, factor=0.25):
         self.date_up(factor=-factor)
@@ -221,13 +231,12 @@ class ChartDisplay(Chart):
         self.start_date-=delta_date*0.5
         self.end_date+=delta_date*0.5
         self.time_frame*=2
-        print(self.end_date-self.start_date)
     
 
     def date_span_down(self):
-        delta_date=self.end_date-self.start_date
-        self.start_date+=delta_date*0.25
-        self.end_date-=delta_date*0.25
-        self.time_frame*=0.5
-        print(self.end_date-self.start_date)
+        if self.time_frame*0.5>=15:
+            delta_date=self.end_date-self.start_date
+            self.start_date+=delta_date*0.25
+            self.end_date-=delta_date*0.25
+            self.time_frame*=0.5
     

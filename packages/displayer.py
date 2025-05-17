@@ -1,8 +1,8 @@
 import curses
 from menu import Menu
 from alpaca.trading.enums import OrderSide, TimeInForce, OrderType
-from exceptions import InvalidOrderData
 from time import sleep
+from chartdisplay import ChartDisplay
 
 
 def draw_block_border(stdscr, y, x, height, width, name=None):
@@ -27,7 +27,7 @@ def draw_loading(stdscr, y, x):
     stdscr.addstr(y, x-len(text)//2, text)
 
 
-def get_market_data_async(widget, widget_setup, result: list):
+def get_market_data_async(widget, chartdisplay, widget_setup, result: list):
     while True:
         widget.add_instrument(widget_setup['uuid'])
         widget.reload_instruments()
@@ -37,7 +37,10 @@ def get_market_data_async(widget, widget_setup, result: list):
             result.pop()
         for patch in whole_patch:
             result.append(patch)
-        sleep(5)
+
+        chartdisplay.create_chart()
+
+        sleep(1)
 
 
 def draw_market_data(stdscr, y, x, width, result):
@@ -67,6 +70,65 @@ def draw_market_data(stdscr, y, x, width, result):
                 length += 3
 
         length += 2
+
+# def draw_chart(stdscr, y, x, self: ChartDisplay):
+#         if self.chart == None:
+#             return -1
+#         else:
+#             for i, ch in enumerate(self.chart):
+#                 if ch["direction"]==1:
+#                     color=1
+#                 else:
+#                     color=2
+#                 for j in range(ch["start"],ch["start"]+ch["length"]):
+#                     if j>=0 and self.height-j-self.place_for_data>=0:
+#                         stdscr.attron(curses.color_pair(color))
+#                         stdscr.addstr(y+self.height-j-self.place_for_data, x+i, "#")
+#                         stdscr.attroff(curses.color_pair(color))
+        
+#                 if i%20==0:
+#                     stdscr.addstr(y+self.height-self.place_for_data+1, x+i, "|") 
+#                     stdscr.addstr(y+self.height-self.place_for_data+2, x+i, str(ch["date"].time()))
+#                     stdscr.addstr(y+self.height-self.place_for_data+3, x+i, str(ch["date"].date())) 
+            
+#             for i in range(self.height-self.place_for_data):
+#                 delta_price=(self.end_price-self.start_price)/(self.height-self.place_for_data)
+#                 if i%10==0:
+#                     stdscr.addstr(y+self.height-i-self.place_for_data, x+self.width-self.place_for_price, "-") 
+#                     stdscr.addstr(y+self.height-i-self.place_for_data, x+self.width-self.place_for_price+2, str(round(self.start_price+delta_price*i,1))) 
+#         stdscr.refresh()
+
+
+def draw_chart(stdscr, y, x, height, width, self: ChartDisplay):
+        if self.chart == None or self.chart_available==False:
+            return -1
+        else:
+            for i, ch in enumerate(self.chart):
+                if i>width:
+                    stdscr.refresh()
+                    break
+                if ch["direction"]==1:
+                    color=1
+                else:
+                    color=2
+                for j in range(ch["start"],ch["start"]+ch["length"]):
+                    if j>=0 and height-j-self.place_for_data>=0:
+                        stdscr.attron(curses.color_pair(color))
+                        stdscr.addstr(y+height-j-self.place_for_data, x+i, "#")
+                        stdscr.attroff(curses.color_pair(color))
+        
+                if i%20==10:
+                    stdscr.addstr(y+height-self.place_for_data+1, x+i-10, "|") 
+                    stdscr.addstr(y+height-self.place_for_data+2, x+i-10, str(ch["date"].time()))
+                    stdscr.addstr(y+height-self.place_for_data+3, x+i-10, str(ch["date"].date())) 
+            
+            for i in range(height-self.place_for_data):
+                delta_price=(self.end_price-self.start_price)/(height-self.place_for_data)
+                if i%10==0:
+                    stdscr.addstr(y+height-i-self.place_for_data, x+width-self.place_for_price, "-") 
+                    stdscr.addstr(y+height-i-self.place_for_data, x+width-self.place_for_price+2, str(round(self.start_price+delta_price*i,1))) 
+        stdscr.refresh()
+
 
 
 def draw_menu(stdscr, y, x, width, menu: Menu):

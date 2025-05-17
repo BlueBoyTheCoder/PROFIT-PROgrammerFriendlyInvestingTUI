@@ -8,6 +8,7 @@ from alpaca.trading.enums import AssetClass
 from alpaca.data.enums import DataFeed
 from alpaca.data.timeframe import TimeFrame
 import yfinance as yf #Necessary for newest data. Alpaca doesn't support newest data
+from datetime import datetime, timedelta, timezone
 
 
 
@@ -93,7 +94,7 @@ class Client:
         return data
             
 
-    def get_newest_data(self, uuid: Asset | str):
+    def get_newest_data(self, uuid: Asset | str, start_time, end_time, data_time_frame):
         right_formats={
             ('datetime',''): 'timestamp',
             ('Open',uuid): 'open',
@@ -102,19 +103,41 @@ class Client:
             ('Close',uuid): 'close'
         }
 
-        data = yf.download(uuid, period="1d", interval="1d", progress=False, auto_adjust=True)
+        match(data_time_frame.unit):
+            case TimeFrame.Minute.unit:
+                interval="5m"
+            case TimeFrame.Hour.unit:
+                interval="1h"
+            case TimeFrame.Day.unit:
+                interval="1d"
+
+
+        data = yf.download(uuid, start=start_time.strftime('%Y-%m-%d'), end=end_time.strftime('%Y-%m-%d'),interval=interval, progress=False, auto_adjust=True)
         data = data.reset_index()
         data = data.rename(columns={"Datetime": "datetime", "Date": "datetime"})
         data = data.to_dict(orient="records")
-        d=data[0]
+        
+        
+        for d in data:
+            d[('datetime','')] = d[('datetime','')].to_pydatetime()
 
-        d[('datetime','')] = d[('datetime','')].to_pydatetime()
-
-        for right_format in right_formats:
-            if right_format in d:
-                d[right_formats[right_format]]=d.pop(right_format)
-        if ('Volume',uuid) in d:
-            d.pop(('Volume',uuid))
-                
+        for d in data:
+            for right_format in right_formats:
+                if right_format in d:
+                    d[right_formats[right_format]]=d.pop(right_format)
+            if ('Volume',uuid) in d:
+                d.pop(('Volume',uuid))
 
         return data
+
+
+    def get_data(self, uuid: Asset, start_time, end_time, data_time_frame: TimeFrame):
+        utc_m4 = timezone(timedelta(hours=-4))
+        date_3d_back = datetime.now(utc_m4)-timedelta(days=3)
+        if start_time < date_3d_back and end_time > date_3d_back:
+            return self.get_historical_data(uuid, start_time, date_3d_back, data_time_frame) + self.get_newest_data(uuid,date_3d_back,end_time,data_time_frame)
+        elif start_time > date_3d_back and end_time > date_3d_back:
+            return self.get_newest_data(uuid,start_time,end_time,data_time_frame)
+        else:
+            return self.get_historical_data(uuid, start_time, end_time, data_time_frame)
+

@@ -7,7 +7,6 @@ from client import Client
 class Chart:
     def __init__(self, uuid=0, time_frame=30, height=15, width=60, start_date=datetime.now()-timedelta(weeks=1), end_date=datetime.now()-timedelta(hours=5)):
         self.data = None
-        #self.instruments = dict()
         self.client = Client()
         self.uuid = uuid
         self.time_frame = time_frame #minutes (time per one char. Ex: time_frame=3 and width=15 then timespan=3*15=45 minutes on 15 char of width)
@@ -23,12 +22,8 @@ class Chart:
             data_time_frame = TimeFrame.Hour
         if self.time_frame >= 1920:
             data_time_frame=TimeFrame.Day
-        # if self.time_frame >= 60*24*7:
-        #     data_time_frame = TimeFrame.Week
-        # if self.time_frame >= 1920:
-        #     data_time_frame = TimeFrame.Month
       
-        self.data = self.client.get_historical_data(self.uuid, self.start_date, self.end_date, data_time_frame)
+        self.data = self.client.get_data(self.uuid, self.start_date, self.end_date, data_time_frame)
 
 
     def update(self, uuid=False, time_frame=False, height=False, width=False, start_date=False, end_date=False):

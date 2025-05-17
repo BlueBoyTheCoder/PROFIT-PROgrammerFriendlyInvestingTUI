@@ -1,14 +1,13 @@
 import curses
 from display_texts import *
 from widget import Widget
-from chart import Chart
-from chartdisplay import ChartDisplay
 from client import Client
 from menu import Menu
 from orders import Orders
+from chartdisplay import ChartDisplay
 import json
-import threading, time
-from datetime import datetime, timedelta
+import threading
+from datetime import datetime, timedelta, timezone
 from displayer import *
 
 
@@ -57,6 +56,8 @@ def draw_working_menu(stdscr):
     widget = Widget()
     menu = Menu()
     orders = Orders(client.get_trading_client())
+    chartdisplay=ChartDisplay( start_price=180, end_price=230)        
+
 
     x, y = 0, 0
     typed=""
@@ -66,12 +67,24 @@ def draw_working_menu(stdscr):
         setup = json.load(json_setup)
 
     widget_setup = setup['widget']
+    chart_setup = setup['chart']
     menu.load_menu_from_json(setup)
+
+    height, width = 60, 250#63, 237#stdscr.getmaxyx()
+
+    utc_m4 = timezone(timedelta(hours=-4))
+    #chartdisplay.update(uuid=chart_setup['uuid'][0], time_frame=120, width=chart_width-2, height=chart_height-2, start_date=datetime.now(tz=utc_m4)-timedelta(hours=2*(chart_width-2)),end_date=datetime.now(tz=utc_m4)+timedelta(days=1))
+    chartdisplay.update(uuid="AAPL",time_frame=120,start_date=datetime.now(utc_m4 )-timedelta(hours=0+(width-2)*2), end_date=datetime.now(utc_m4)+timedelta(days=1),height=height, width=width)  
+    # chartdisplay.update(width=chart_width-2, height=chart_height-2)
+
 
     result=[]
 
-    thread = threading.Thread(target=get_market_data_async, args=(widget, widget_setup, result), daemon=True)
+    thread = threading.Thread(target=get_market_data_async, args=(widget, chartdisplay, widget_setup, result), daemon=True)
     thread.start()
+
+    # thread_chart = threading.Thread(target=chartdisplay.create_chart(), args=(), daemon=True)
+    # thread_chart.start()
 
     stdscr.clear()
     
@@ -92,16 +105,23 @@ def draw_working_menu(stdscr):
         menu_y, menu_x = 1, (width - 3) * 2 // 3 + 1
 
 
+        
+
+        #chartdisplay.update(width=chart_width-2, height=chart_height-2)
+        #chartdisplay.create_chart()
+        #chartdisplay.display_chart(stdscr, chart_y+1, chart_x+1)
+        #chartdisplay.create_chart()
+
+        draw_market_data(stdscr, widget_y, widget_x, widget_width, result)
+        draw_chart(stdscr, chart_y+1, chart_x+1, chart_height-2, chart_width-2, chartdisplay)
+        draw_menu(stdscr, menu_y, menu_x, menu_width, menu)
+        draw_action(stdscr, action_y, action_x, action_width, menu)
+
         draw_block_border(stdscr, 0, 0, height, width - 1, "PROFIT")
         draw_block_border(stdscr, widget_y, widget_x, widget_height, widget_width, "MARKET─DATA")
         draw_block_border(stdscr, action_y, action_x, action_height, action_width, "ACTIONS")
         draw_block_border(stdscr, chart_y, chart_x, chart_height, chart_width, "CHARTS")
         draw_block_border(stdscr, menu_y, menu_x, menu_height, menu_width, "MENU")
-
-
-        draw_market_data(stdscr, widget_y, widget_x, widget_width, result)
-        draw_menu(stdscr, menu_y, menu_x, menu_width, menu)
-        draw_action(stdscr, action_y, action_x, action_width, menu)
 
 
         def set_button():
@@ -124,7 +144,7 @@ def draw_working_menu(stdscr):
                 if menu.menu_part_selected("BUY/SELL"):
                     data = menu.get_current_component_parts_values()
                     if process_order_data(data) != -1:
-                        orders.update_order(data[0],data[1],data[2],data[3],data[4],data[5])
+                        orders.update_order(*data)
                         orders.submit_order()
 
             case char if char == ord('\t'):

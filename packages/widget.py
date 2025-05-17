@@ -1,5 +1,3 @@
-from alpaca.data.timeframe import TimeFrame
-from datetime import datetime, timedelta, timezone
 from client import Client
 
 
@@ -28,7 +26,7 @@ class Widget:
 
     def reload_instruments(self):
         for uuid in self.instruments:
-            data = self.client.get_newest_data(uuid)[0]
+            data = self.client.get_lastday_data(uuid)[0]
             data_dict=dict()
             data_dict['timestamp']=data['timestamp']
             data_dict['price']=round(data['close'],2)
@@ -38,7 +36,7 @@ class Widget:
     
 
     def reload_instrument(self, uuid):
-        data = self.client.get_newest_data(uuid)[0]
+        data = self.client.get_lastday_data(uuid)[0]
         data_dict=dict()
         data_dict['timestamp']=data['timestamp']
         data_dict['price']=round(data['close'],2)
