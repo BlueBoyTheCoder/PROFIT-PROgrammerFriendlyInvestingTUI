@@ -24,6 +24,10 @@ class Chart:
             data_time_frame=TimeFrame.Day
       
         self.data = self.client.get_data(self.uuid, self.start_date, self.end_date, data_time_frame)
+    
+    def get_current_price(self):
+        return self.client.get_lastday_data(self.uuid)[0]['close']
+        # self.client.get_newest_data(self.uuid,datetime.now()-timedelta(weeks=1),datetime.now()+timedelta(hours=1), TimeFrame.Day)
 
 
     def update(self, uuid=False, time_frame=False, height=False, width=False, start_date=False, end_date=False):

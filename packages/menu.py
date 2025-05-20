@@ -5,7 +5,7 @@ class Menu:
         self.components_parts = dict()
         self.components_parts_buttons = dict()
 
-        self.current_component_selected=0
+        #self.current_component_selected=0
         self.current_component_loaded=None # string - which component is loaded in action block
         self.current_component_part_selected = dict() # int - which part is selected in particular components
         self.current_component_part_button_selected = dict() # int - which button of part is selected in particular components
@@ -23,8 +23,8 @@ class Menu:
         curr_part=part
         curr_butt_n=self.current_component_part_button_selected[curr_comp][curr_part]
         if curr_butt_n==-1:
-            if self.components_parts_buttons[curr_comp][curr_part] in ["","type"]:
-                return "type"
+            if type(self.components_parts_buttons[curr_comp][curr_part]) == str:
+                return self.components_parts_buttons[curr_comp][curr_part]
             return self.components_parts_buttons[curr_comp][curr_part]
         return self.components_parts_buttons[curr_comp][curr_part][curr_butt_n]
         
@@ -47,6 +47,10 @@ class Menu:
 #
     def action_part_selected(self, part):
         return self.current_selection_state==1 and self.components_parts[self.current_component_loaded][self.current_component_part_selected[self.current_component_loaded]]==part
+
+
+    def action_current_part_selected(self):
+        return self.components_parts[self.current_component_loaded][self.current_component_part_selected[self.current_component_loaded]]
 
 
 #
@@ -72,6 +76,10 @@ class Menu:
             else:
                 result+=[self.components_parts_buttons[curr_comp][key]]
         return result
+    
+    def get_current_component_part(self):
+        return self.current_component_part_selected[self.current_component_loaded]
+
 
     def alter_state(self):
         self.current_selection_state=(self.current_selection_state+1) % 2
@@ -129,6 +137,14 @@ class Menu:
             if curr_butt_n==-1:
                 self.components_parts_buttons[curr_comp][curr_part]=text
 
+    
+    def get_button_number(self):
+        if self.current_selection_state==1:
+            curr_comp=self.current_component_loaded
+            curr_part_n=self.current_component_part_selected[curr_comp]
+            return curr_part_n
+        return -1
+
 
 #
     def load_component_from_json(self, name: str, subparts: list[str], subparts_buttons: dict):
@@ -138,7 +154,7 @@ class Menu:
         self.current_component_part_selected[name]=0 #subparts[0]
         self.current_component_part_button_selected[name]=subparts_buttons.copy()
         for button in self.current_component_part_button_selected[name]:
-            if self.current_component_part_button_selected[name][button]=="type":
+            if type(self.current_component_part_button_selected[name][button])==str:
                 self.current_component_part_button_selected[name][button]=-1
             else:
                 self.current_component_part_button_selected[name][button]=0

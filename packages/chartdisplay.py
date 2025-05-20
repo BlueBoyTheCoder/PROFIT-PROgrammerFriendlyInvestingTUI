@@ -12,6 +12,9 @@ class ChartDisplay(Chart):
         self.place_for_price=7
         self.start_price=start_price
         self.end_price=end_price
+        self.price=None
+        self.current_data=False #False when data needs to be updated
+        self.pending_uuid=None
         ###bez if ustalić wcześńiej
         # if start_date is None:
         #     super().__init__(uuid, time_frame, height, width, datetime.now()-timedelta(minutes=time_frame*(width-self.place_for_price)), datetime.now())
@@ -36,11 +39,27 @@ class ChartDisplay(Chart):
         if end_date: 
             self.end_date = end_date
         
+        
+        
+    def uncurrent_data(self):
+        self.current_data=False
 
+    
+    def set_pending_uuid(self, uuid):
+        if self.client.uuid_exists(uuid):
+            self.pending_uuid=uuid
+            self.uncurrent_data()
 
     
     def create_chart(self):
+        if self.current_data:
+            return
+        if self.pending_uuid:
+            self.uuid=self.pending_uuid
+            self.pending_uuid=None
         chart=[dict() for _ in range(self.width-self.place_for_price)]
+
+        self.price=round(self.get_current_price(),2)
         
         self.reload()
         price=[]
@@ -163,6 +182,7 @@ class ChartDisplay(Chart):
 
         self.chart_available=False
         self.chart=chart
+        self.current_data=True
         self.chart_available=True     
     
 
@@ -227,14 +247,15 @@ class ChartDisplay(Chart):
 
 
     def date_span_up(self):
-        delta_date=self.end_date-self.start_date
-        self.start_date-=delta_date*0.5
-        self.end_date+=delta_date*0.5
-        self.time_frame*=2
-    
+        if self.time_frame<61440:
+            delta_date=self.end_date-self.start_date
+            self.start_date-=delta_date*0.5
+            self.end_date+=delta_date*0.5
+            self.time_frame*=2
+        
 
     def date_span_down(self):
-        if self.time_frame*0.5>=15:
+        if self.time_frame>15:
             delta_date=self.end_date-self.start_date
             self.start_date+=delta_date*0.25
             self.end_date-=delta_date*0.25

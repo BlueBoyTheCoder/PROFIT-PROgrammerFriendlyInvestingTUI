@@ -1,16 +1,18 @@
 {
     "widget": 
         {  
-            "uuid": ["AAPL","SPY","GOOGL","TSLA","META","NVDA","V"]
+            "uuid": ["AAPL","SPY","GOOGL","TSLA","NVDA","V"]
         },
     "menu": 
         {
             "menu_parts":
             {
-                "CLIENT INFO": ["a","b"],
-                "SETTINGS": ["S1","S2","S3","S4","S5","S6"],
+                "CLIENT INFO": ["a","b","c"],
+                "WIDGET SETTINGS": ["WIDGET 1","WIDGET 2","WIDGET 3","WIDGET 4","WIDGET 5","WIDGET 6"],
+                "CHART SETTINGS": ["CHART 1"],
                 "BUY/SELL": ["SYMBOL","QUANTITY","ORDER SIDE","ORDER TYPE","TIME IN FORCE","PRICE"],
-                "OPEN POSITIONS": ["a","b"]
+                "CHART MANIPULATION": ["MOVE DATE DOWN","MOVE DATE UP","INCRESE DATE RANGE","DECRISE DATE RANGE","MOVE PRICE DOWN","MOVE PRICE UP","INCRESE PRICE RANGE","DECRISE PRICE RANGE"],
+                "OPEN POSITIONS": []
             },
 
             "menu_buttons":
@@ -18,16 +20,21 @@
                 "CLIENT INFO": 
                 {
                     "a": "type",
-                    "b": "type"
+                    "b": "type",
+                    "c": "type"
                 },
-                "SETTINGS":
+                "WIDGET SETTINGS":
                 {
-                    "S1": "type",
-                    "S2": "type",
-                    "S3": "type",
-                    "S4": "type",
-                    "S5": "type",
-                    "S6": "type"
+                    "WIDGET 1": "AAPL",
+                    "WIDGET 2": "SPY",
+                    "WIDGET 3": "GOOGL",
+                    "WIDGET 4": "TSLA",
+                    "WIDGET 5": "NVDA",
+                    "WIDGET 6": "V"
+                },
+                "CHART SETTINGS":
+                {
+                    "CHART 1": "AAPL"
                 },
                 "BUY/SELL": 
                 {
@@ -36,12 +43,21 @@
                     "ORDER SIDE": ["BUY", "SELL"],
                     "ORDER TYPE":["MARKET", "LIMIT", "STOP", "STOP_LIMIT"],
                     "TIME IN FORCE":["DAY","GTC","OPG","CLS","IOC","FOK"],
-                    "PRICE": "type"
+                    "PRICE": "0"
+                },
+                "CHART MANIPULATION": 
+                {
+                    "MOVE DATE DOWN": [">>>"],
+                    "MOVE DATE UP": ["<<<"],
+                    "INCRESE DATE RANGE": ["< >"],
+                    "DECRISE DATE RANGE": ["> <"],
+                    "MOVE PRICE DOWN": ["/\\"],
+                    "MOVE PRICE UP": ["\\/"],
+                    "INCRESE PRICE RANGE": ["< >"],
+                    "DECRISE PRICE RANGE": ["> <"]
                 },
                 "OPEN POSITIONS":
                 {
-                    "a": "type",
-                    "b": "type"
                 }
             }
         },

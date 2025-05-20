@@ -36,7 +36,7 @@ class Orders:
         try:
             order = self.trading_client.submit_order(order_request)
         except APIError as err:
-            return err.message
+            return 1
 
         self.current_orders_ids.append(order.id)
 
@@ -53,7 +53,7 @@ class Orders:
         try:
             order = self.trading_client.submit_order(order_request)
         except APIError as err:
-            return err.message
+            return 1
 
         self.current_orders_ids.append(order.id)
 
@@ -70,7 +70,7 @@ class Orders:
         try:
             order = self.trading_client.submit_order(order_request)
         except APIError as err:
-            return err.message
+            return 1
 
         self.current_orders_ids.append(order.id)
 
@@ -89,7 +89,7 @@ class Orders:
         try:
             order = self.trading_client.submit_order(order_request)
         except APIError as err:
-            return err.message
+            return 1
 
         self.current_orders_ids.append(order.id)
 

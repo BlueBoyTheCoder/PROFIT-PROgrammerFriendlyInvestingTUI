@@ -17,6 +17,7 @@ def main():
     chart = Chart()
     utc_m4 = timezone(timedelta(hours=-4))
     menu = Menu()
+    widget=Widget()
 
     def print_list(lista):
         for l in lista:
@@ -40,8 +41,8 @@ def main():
 
     #data = client.get_data("AAPL", datetime.now(utc_m4)-timedelta(days=1), datetime.now(utc_m4)+timedelta(days=1),TimeFrame.Hour)
 
-    data = client.get_data(uuid="AAPL",start_time=datetime.now(utc_m4 )-timedelta(hours=0), end_time=datetime.now(utc_m4)+timedelta(days=1),data_time_frame=TimeFrame.Hour)
-    print(data)
+    # data = client.get_data(uuid="AAPL",start_time=datetime.now(utc_m4 )-timedelta(hours=0), end_time=datetime.now(utc_m4)+timedelta(days=1),data_time_frame=TimeFrame.Hour)
+    # print(data)
 
     # data = client.get_newest_data("SPY")
     # print(data)
@@ -166,8 +167,21 @@ def main():
 
     # chartdisplay=ChartDisplay(uuid="AAPL",time_frame=1920,start_date=datetime.now()-timedelta(hours=100+24*180), end_date=datetime.now()-timedelta(hours=100),height=45, width=180)
     # chartdisplay.create_chart()
+    
 
+    # print(client.uuid_exists("asd"))
+    # print(widget.add_instrument("AAPL"))
+    # i=0
+    # while(1):
+    #     i+=1
+    #     widget.reload_instruments()
+    #     print(widget.get_widget_patch(1000), i)
 
+    for a in client.get_client_positions():
+        print(a)
+
+    for a in client.get_client_orders():
+        print(a)
 
 
 

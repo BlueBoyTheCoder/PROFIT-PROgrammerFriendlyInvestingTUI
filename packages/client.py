@@ -9,6 +9,7 @@ from alpaca.data.enums import DataFeed
 from alpaca.data.timeframe import TimeFrame
 import yfinance as yf #Necessary for newest data. Alpaca doesn't support newest data
 from datetime import datetime, timedelta, timezone
+from alpaca.common.exceptions import APIError
 
 
 
@@ -38,6 +39,12 @@ class Client:
     
     def get_client_positions(self):
         return [dict(filter(lambda item: item[0] in ['symbol','qty','avg_entry_price','current_price'],dict(position).items())) for position in self.client.get_all_positions()]
+
+
+    def get_client_orders(self):
+        return [dict(filter(lambda item: item[0] in ['symbol','qty','side','type','time_in_force','avg_entry_price','current_price','created_at','expired_at','filled_at'],dict(position).items())) for position in self.client.get_orders()]
+
+    
 
 
     def get_historical_data(self, uuid: Asset, start_time, end_time, data_time_frame: TimeFrame):
@@ -133,7 +140,7 @@ class Client:
 
     def get_data(self, uuid: Asset, start_time, end_time, data_time_frame: TimeFrame):
         utc_m4 = timezone(timedelta(hours=-4))
-        date_3d_back = datetime.now(utc_m4)-timedelta(days=3)
+        date_3d_back = datetime.now(utc_m4)-timedelta(days=7)
         if start_time < date_3d_back and end_time > date_3d_back:
             return self.get_historical_data(uuid, start_time, date_3d_back, data_time_frame) + self.get_newest_data(uuid,date_3d_back,end_time,data_time_frame)
         elif start_time > date_3d_back and end_time > date_3d_back:
@@ -141,3 +148,10 @@ class Client:
         else:
             return self.get_historical_data(uuid, start_time, end_time, data_time_frame)
 
+
+    def uuid_exists(self, uuid: str):
+        try:
+            self.client.get_asset(uuid)
+        except APIError:
+            return False
+        return True

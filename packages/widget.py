@@ -1,20 +1,27 @@
 from client import Client
 
 
-
 class Widget:
     def __init__(self, instruments_uuid=None):
         self.client = Client()
+        self.pending_instruments=None
         if instruments_uuid: 
-            if type(instruments_uuid)==str: self.instruments=dict([(instruments_uuid,None)])
-            elif type(instruments_uuid)==list: self.instruments=dict([(inst,None) for inst in instruments_uuid])
-        else: self.instruments = dict()
+            if type(instruments_uuid)==str: 
+                self.instruments=dict([(instruments_uuid,None)])
+            elif type(instruments_uuid)==list: 
+                self.instruments=dict([(inst,None) for inst in instruments_uuid])
+        else: 
+            self.instruments = dict()
 
 
     def add_instrument(self,instruments_uuid: str | list):
-        if type(instruments_uuid)==str: self.instruments[instruments_uuid]=None
+        if type(instruments_uuid)==str: 
+            if self.client.uuid_exists(instruments_uuid):
+                self.instruments[instruments_uuid]=None
         elif type(instruments_uuid)==list:
-            for inst in instruments_uuid: self.instruments[inst]=None
+            for inst in instruments_uuid: 
+                if self.client.uuid_exists(inst):
+                    self.instruments[inst]=None
 
     
     def pop_instrument(self,instruments_uuid: str | list):
@@ -22,9 +29,26 @@ class Widget:
             self.instruments.pop(instruments_uuid)
         elif type(instruments_uuid)==list: 
             for inst in instruments_uuid: self.instruments.pop(inst)
+    
+
+    def pop_all_instruments(self):
+        self.instruments=dict()
+
+
+    def set_pending_instruments(self, instruments):
+        self.pending_instruments=instruments
+
+
+    def load_pending_instruments(self):
+        if self.pending_instruments!=None:
+            self.pop_all_instruments()
+            self.add_instrument(self.pending_instruments)
+            self.pending_instruments=None
 
 
     def reload_instruments(self):
+        self.load_pending_instruments()
+
         for uuid in self.instruments:
             data = self.client.get_lastday_data(uuid)[0]
             data_dict=dict()
@@ -47,7 +71,7 @@ class Widget:
     
     def get_instruments_data(self):
         return self.instruments
-    
+
 
     def get_widget_patch(self, max_length):
         self.reload_instruments()
