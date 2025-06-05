@@ -45,9 +45,9 @@ def draw_order_confirmation(stdscr, window_height, window_width, order_result=Tr
     x = (window_width - width) // 2
     y = (window_height - height) // 2
     draw_block_border(stdscr, y, x, height, width)
-    stdscr.attron(curses.color_pair(4))
+    stdscr.attron(curses.color_pair(CursesColors.MARKED))
     stdscr.addstr(y + 2, x + 2, text)
-    stdscr.attroff(curses.color_pair(4))
+    stdscr.attroff(curses.color_pair(CursesColors.MARKED))
     stdscr.refresh()
     sleep(1.5)
 
@@ -75,11 +75,11 @@ def draw_positions(stdscr, window_height, window_width, positions: list[dict]):
 
     draw_block_border(stdscr, y, x, height, width, "OPEN POSITIONS")
 
-    stdscr.attron(curses.color_pair(4))
+    stdscr.attron(curses.color_pair(CursesColors.MARKED))
     stdscr.addstr(y + 2, x + 2, names[0] + " " * (symbol_width - len(names[0]) + 1) + names[1] + " " 
                   * (entry_price_width - len(names[1]) + 1) + names[2] + " " * (qty_width - len(names[2]) + 1) 
                   + names[3] + " " * (price_width - len(names[3]) + 1))
-    stdscr.attroff(curses.color_pair(4))
+    stdscr.attroff(curses.color_pair(CursesColors.MARKED))
 
     for i, symbol in enumerate(positions):
         stdscr.addstr(y + 2 * i + 4, x + 2, symbol["symbol"] + " " * (symbol_width - len(symbol["symbol"]) + 1) 
@@ -122,15 +122,15 @@ def draw_market_data(stdscr, y, x, width, result):
 
         match patch[1]:
             case 1:
-                stdscr.attron(curses.color_pair(1))
+                stdscr.attron(curses.color_pair(CursesColors.POSITIVE_TRADE))
                 stdscr.addstr(y + 1, x + 1 + length, " /\\ ")
                 length += 4
-                stdscr.attroff(curses.color_pair(1))
+                stdscr.attroff(curses.color_pair(CursesColors.POSITIVE_TRADE))
             case -1:
-                stdscr.attron(curses.color_pair(2))
+                stdscr.attron(curses.color_pair(CursesColors.NEGATIVE_TRADE))
                 stdscr.addstr(y + 1, x + 1 + length, " \\/ ")
                 length += 4
-                stdscr.attroff(curses.color_pair(2))
+                stdscr.attroff(curses.color_pair(CursesColors.NEGATIVE_TRADE))
             case _:
                 stdscr.addstr(y + 1, x + 1 + length, " - ")
                 length += 3
@@ -150,9 +150,9 @@ def draw_chart(stdscr, y, x, height, width, self: ChartDisplay):
                 stdscr.refresh()
                 break
             if ch["direction"] == 1:
-                color = 1
+                color = CursesColors.POSITIVE_TRADE
             else:
-                color = 2
+                color = CursesColors.NEGATIVE_TRADE
             for j in range(ch["start"], ch["start"] + ch["length"]):
                 if j >= 0 and height - j - self.place_for_data >= 0:
                     stdscr.attron(curses.color_pair(color))
@@ -171,9 +171,9 @@ def draw_chart(stdscr, y, x, height, width, self: ChartDisplay):
                 stdscr.addstr(y + height - i - self.place_for_data, x + width - self.place_for_price + 2, str(round(self.start_price + delta_price * i, 1)))
 
     draw_block_border(stdscr, y, x, 3, len(self.uuid) + len(str(self.price)) + 3)
-    stdscr.attron(curses.color_pair(4))
+    stdscr.attron(curses.color_pair(CursesColors.MARKED))
     stdscr.addstr(y + 1, x + 1, self.uuid + " " + str(self.price))
-    stdscr.attroff(curses.color_pair(4))
+    stdscr.attroff(curses.color_pair(CursesColors.MARKED))
     stdscr.addstr(y + 1, x + 1, self.uuid + " ")
     stdscr.refresh()
 
@@ -184,9 +184,9 @@ def draw_menu(stdscr, y, x, width, menu: Menu):
     """
     draw_block_border(stdscr, y + 2, x + 1, 3, width - 2, "TIME")
     current_time = ctime()
-    stdscr.attron(curses.color_pair(4))
+    stdscr.attron(curses.color_pair(CursesColors.MARKED))
     stdscr.addstr(y + 3, x + (width - len(current_time)) // 2, current_time)
-    stdscr.attroff(curses.color_pair(4))
+    stdscr.attroff(curses.color_pair(CursesColors.MARKED))
     y += 2
     for i, part in enumerate(menu.get_component_parts("MENU")):
         draw_block_border(stdscr, y + 1 + 3 * (i + 1), x + 1, 3, width - 2)
