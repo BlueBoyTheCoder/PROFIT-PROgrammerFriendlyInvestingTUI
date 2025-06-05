@@ -7,47 +7,43 @@ from alpaca.trading.models import Asset
 from alpaca.trading.enums import AssetClass
 from alpaca.data.enums import DataFeed
 from alpaca.data.timeframe import TimeFrame
-import yfinance as yf #Necessary for newest data. Alpaca doesn't support newest data
+import yfinance as yf  # Necessary for newest data. Alpaca doesn't support newest data
 from datetime import datetime, timedelta, timezone
 from alpaca.common.exceptions import APIError
-
 
 
 class Client:
     def __init__(self, api_key=None, secret_key=None, paper=True):
         if api_key and secret_key:
-            self.client = TradingClient(api_key,secret_key, paper=paper)
-            self.crypto_client = CryptoHistoricalDataClient(api_key,secret_key)
-            self.stock_client = StockHistoricalDataClient(api_key,secret_key)
-            self.option_client = OptionHistoricalDataClient(api_key,secret_key)
+            self.client = TradingClient(api_key, secret_key, paper=paper)
+            self.crypto_client = CryptoHistoricalDataClient(api_key, secret_key)
+            self.stock_client = StockHistoricalDataClient(api_key, secret_key)
+            self.option_client = OptionHistoricalDataClient(api_key, secret_key)
         elif not api_key and not secret_key:
-            self.client = TradingClient(API_KEY,SECRET_KEY, paper=paper)
-            self.crypto_client = CryptoHistoricalDataClient(API_KEY,SECRET_KEY)
-            self.stock_client = StockHistoricalDataClient(API_KEY,SECRET_KEY)
-            self.option_client = OptionHistoricalDataClient(API_KEY,SECRET_KEY)
+            self.client = TradingClient(API_KEY, SECRET_KEY, paper=paper)
+            self.crypto_client = CryptoHistoricalDataClient(API_KEY, SECRET_KEY)
+            self.stock_client = StockHistoricalDataClient(API_KEY, SECRET_KEY)
+            self.option_client = OptionHistoricalDataClient(API_KEY, SECRET_KEY)
         else:
             raise InvalidKey("Your API_KEY or SECRET_KEY is invalid or undetermined")
-        
 
     def get_trading_client(self):
         return self.client
 
-
     def get_client_status(self):
-        return dict(filter(lambda item: item[0] in ['status','crypto_status','options_buying_power'],dict(self.client.get_account()).items()))
-   
-    
-    def get_client_positions(self):
-        return [dict(filter(lambda item: item[0] in ['symbol','qty','avg_entry_price','current_price'],dict(position).items())) for position in self.client.get_all_positions()]
+        return dict(filter(lambda item: item[0] in ["status", "crypto_status", "options_buying_power"], dict(self.client.get_account()).items()))
 
+    def get_client_positions(self):
+        return [dict(filter(lambda item: item[0] in ["symbol", "qty", "avg_entry_price", "current_price"], dict(position).items())) for position in self.client.get_all_positions()]
 
     def get_client_orders(self):
-        return [dict(filter(lambda item: item[0] in ['symbol','qty','side','type','time_in_force','avg_entry_price','current_price','created_at','expired_at','filled_at'],dict(position).items())) for position in self.client.get_orders()]
-
-    
-
+        return [dict(filter(lambda item: item[0] in ["symbol", "qty", "side", "type", "time_in_force", "avg_entry_price", "current_price", "created_at", "expired_at", "filled_at"], dict(position).items())) for position in self.client.get_orders()]
 
     def get_historical_data(self, uuid: Asset, start_time, end_time, data_time_frame: TimeFrame):
+        """
+        gets (not current, then we use yfinance) data of finantial instrument
+        and returns it
+        """
         if self.client.get_asset(uuid).asset_class == AssetClass.CRYPTO:
             get_bars = self.crypto_client.get_crypto_bars
             local_request = CryptoBarsRequest
@@ -60,26 +56,17 @@ class Client:
         else:
             raise InvalidAssetClass()
 
-        local_request_params = local_request(
-                                symbol_or_symbols=uuid,
-                                timeframe=data_time_frame,
-                                start=start_time,
-                                end=end_time
-                            )
+        local_request_params = local_request(symbol_or_symbols=uuid, timeframe=data_time_frame, start=start_time, end=end_time)
 
         bars = get_bars(local_request_params)
 
-        return [dict(filter(lambda item: item[0] in ['timestamp', 'open', 'close', 'low', 'high'],dict(b).items())) for b in bars[uuid]] 
-    
+        return [dict(filter(lambda item: item[0] in ["timestamp", "open", "close", "low", "high"], dict(b).items())) for b in bars[uuid]]
 
     def get_lastday_data(self, uuid: Asset | str):
-        right_formats={
-            ('datetime',''): 'timestamp',
-            ('Open',uuid): 'open',
-            ('High',uuid): 'high',
-            ('Low',uuid): 'low',
-            ('Close',uuid): 'close'
-        }
+        """
+        gets lastday data of finantial instrument and returns it
+        """
+        right_formats = {("datetime", ""): "timestamp", ("Open", uuid): "open", ("High", uuid): "high", ("Low", uuid): "low", ("Close", uuid): "close"}
 
         data = yf.download(uuid, period="1d", interval="5m", progress=False, auto_adjust=True)
 
@@ -89,67 +76,68 @@ class Client:
         data = data.to_dict(orient="records")
 
         for d in data:
-            d[('datetime','')] = d[('datetime','')].to_pydatetime()
+            d[("datetime", "")] = d[("datetime", "")].to_pydatetime()
 
         for d in data:
             for right_format in right_formats:
                 if right_format in d:
-                    d[right_formats[right_format]]=d.pop(right_format)
-            if ('Volume',uuid) in d:
-                d.pop(('Volume',uuid))
+                    d[right_formats[right_format]] = d.pop(right_format)
+            if ("Volume", uuid) in d:
+                d.pop(("Volume", uuid))
 
         return data
-            
 
     def get_newest_data(self, uuid: Asset | str, start_time, end_time, data_time_frame):
-        right_formats={
-            ('datetime',''): 'timestamp',
-            ('Open',uuid): 'open',
-            ('High',uuid): 'high',
-            ('Low',uuid): 'low',
-            ('Close',uuid): 'close'
-        }
+        """
+        gets newest (not necessarly newest, but it uses yfinance insted of alpaca)
+        data of finantial instrument and returns it
+        """
+        right_formats = {("datetime", ""): "timestamp", ("Open", uuid): "open", ("High", uuid): "high", ("Low", uuid): "low", ("Close", uuid): "close"}
 
-        match(data_time_frame.unit):
+        match (data_time_frame.unit):
             case TimeFrame.Minute.unit:
-                interval="5m"
+                interval = "5m"
             case TimeFrame.Hour.unit:
-                interval="1h"
+                interval = "1h"
             case TimeFrame.Day.unit:
-                interval="1d"
+                interval = "1d"
 
-
-        data = yf.download(uuid, start=start_time.strftime('%Y-%m-%d'), end=end_time.strftime('%Y-%m-%d'),interval=interval, progress=False, auto_adjust=True)
+        data = yf.download(uuid, start=start_time.strftime("%Y-%m-%d"), end=end_time.strftime("%Y-%m-%d"), interval=interval, progress=False, auto_adjust=True)
         data = data.reset_index()
         data = data.rename(columns={"Datetime": "datetime", "Date": "datetime"})
         data = data.to_dict(orient="records")
-        
-        
+
         for d in data:
-            d[('datetime','')] = d[('datetime','')].to_pydatetime()
+            d[("datetime", "")] = d[("datetime", "")].to_pydatetime()
 
         for d in data:
             for right_format in right_formats:
                 if right_format in d:
-                    d[right_formats[right_format]]=d.pop(right_format)
-            if ('Volume',uuid) in d:
-                d.pop(('Volume',uuid))
+                    d[right_formats[right_format]] = d.pop(right_format)
+            if ("Volume", uuid) in d:
+                d.pop(("Volume", uuid))
 
         return data
 
-
     def get_data(self, uuid: Asset, start_time, end_time, data_time_frame: TimeFrame):
+        """
+        gets data using get_newst_data and get_historical_data for current
+        and uncarrent data respectively
+        than returns it
+        """
         utc_m4 = timezone(timedelta(hours=-4))
-        date_3d_back = datetime.now(utc_m4)-timedelta(days=7)
+        date_3d_back = datetime.now(utc_m4) - timedelta(days=7)
         if start_time < date_3d_back and end_time > date_3d_back:
-            return self.get_historical_data(uuid, start_time, date_3d_back, data_time_frame) + self.get_newest_data(uuid,date_3d_back,end_time,data_time_frame)
+            return self.get_historical_data(uuid, start_time, date_3d_back, data_time_frame) + self.get_newest_data(uuid, date_3d_back, end_time, data_time_frame)
         elif start_time > date_3d_back and end_time > date_3d_back:
-            return self.get_newest_data(uuid,start_time,end_time,data_time_frame)
+            return self.get_newest_data(uuid, start_time, end_time, data_time_frame)
         else:
             return self.get_historical_data(uuid, start_time, end_time, data_time_frame)
 
-
     def uuid_exists(self, uuid: str):
+        """
+        Checks if given uuid actually exist
+        """
         try:
             self.client.get_asset(uuid)
         except APIError:
