@@ -30,25 +30,29 @@ def draw_logging_menu(stdscr):
         stdscr.clear()
         height, width = stdscr.getmaxyx()
 
-        if height<HEIGHT_MIN or width<WIDTH_MIN:
-            stdscr.addstr(0, 0, WRONG_SIZE_MESSAGE)
-            stdscr.refresh()
+        # if height<HEIGHT_MIN or width<WIDTH_MIN:
+        #     stdscr.addstr(0, 0, WRONG_SIZE_MESSAGE)
+        #     stdscr.refresh()
 
-            key = stdscr.getch()
+        #     key = stdscr.getch()
 
-            if key == ord('q'):
-                return 0
-            else:
-                continue
+        #     if key == ord('q'):
+        #         return 0
+        #     else:
+        #         continue
 
-        draw_block_border(stdscr, 0, 0, height, width - 1)
+        draw_block_border(stdscr, 1, 1, 17, 52)
 
         x_profit, y_profit = width // 2 - 20, height // 2 - 4
 
         for i in range(len(PROFIT)):
-            stdscr.addstr(y_profit + i, x_profit, PROFIT[i])
+            stdscr.addstr(i+3, 7, PROFIT[i])
 
-        draw_loading(stdscr,y_profit+len(PROFIT)+2, width//2)
+        stdscr.addstr(10, 15, "-PROgrammer Friendly")
+        stdscr.addstr(12, 15, "-Investing")
+        stdscr.addstr(14, 15, "-Text user interface")
+
+        #draw_loading(stdscr,20, 20)
 
 
         stdscr.refresh()
@@ -207,9 +211,9 @@ def draw_working_menu(stdscr):
                     elif part_selected==parts[1]: 
                         chartdisplay.date_up(factor=0.1)
                     elif part_selected==parts[2]: 
-                        chartdisplay.date_span_up()
-                    elif part_selected==parts[3]: 
                         chartdisplay.date_span_down()
+                    elif part_selected==parts[3]: 
+                        chartdisplay.date_span_up()
                     elif part_selected==parts[4]: 
                         chartdisplay.price_down(factor=0.1)
                     elif part_selected==parts[5]: 

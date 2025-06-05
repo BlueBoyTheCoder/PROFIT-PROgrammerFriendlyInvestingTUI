@@ -7,7 +7,6 @@
         {
             "menu_parts":
             {
-                "CLIENT INFO": ["a","b","c"],
                 "WIDGET SETTINGS": ["WIDGET 1","WIDGET 2","WIDGET 3","WIDGET 4","WIDGET 5","WIDGET 6"],
                 "CHART SETTINGS": ["CHART 1"],
                 "BUY/SELL": ["SYMBOL","QUANTITY","ORDER SIDE","ORDER TYPE","TIME IN FORCE","PRICE"],
@@ -17,12 +16,6 @@
 
             "menu_buttons":
             {
-                "CLIENT INFO": 
-                {
-                    "a": "type",
-                    "b": "type",
-                    "c": "type"
-                },
                 "WIDGET SETTINGS":
                 {
                     "WIDGET 1": "AAPL",
@@ -49,12 +42,12 @@
                 {
                     "MOVE DATE DOWN": [">>>"],
                     "MOVE DATE UP": ["<<<"],
-                    "INCRESE DATE RANGE": ["< >"],
-                    "DECRISE DATE RANGE": ["> <"],
+                    "INCRESE DATE RANGE": ["> <"],
+                    "DECRISE DATE RANGE": ["< >"],
                     "MOVE PRICE DOWN": ["/\\"],
                     "MOVE PRICE UP": ["\\/"],
-                    "INCRESE PRICE RANGE": ["< >"],
-                    "DECRISE PRICE RANGE": ["> <"]
+                    "INCRESE PRICE RANGE": ["> <"],
+                    "DECRISE PRICE RANGE": ["< >"]
                 },
                 "OPEN POSITIONS":
                 {

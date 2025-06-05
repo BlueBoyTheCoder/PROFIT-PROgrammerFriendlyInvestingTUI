@@ -5,13 +5,12 @@ import time
 
 
 class ChartDisplay(Chart):
-    def __init__(self, uuid=0, time_frame=30, height=15, width=60, start_date=None, end_date=None, start_price=100, end_price=300):
+    def __init__(self, uuid=0, time_frame=30, height=15, width=60, start_date=None, end_date=None, start_price=None, end_price=None):
         self.chart=None
         self.chart_available=True
         self.place_for_data=4
         self.place_for_price=7
-        self.start_price=start_price
-        self.end_price=end_price
+        
         self.price=None
         self.current_data=False #False when data needs to be updated
         self.pending_uuid=None
@@ -19,6 +18,21 @@ class ChartDisplay(Chart):
         # if start_date is None:
         #     super().__init__(uuid, time_frame, height, width, datetime.now()-timedelta(minutes=time_frame*(width-self.place_for_price)), datetime.now())
         # else:
+        if start_price==None:
+            self.reload()
+            self.start_price=float("inf")
+            self.end_price=-float("inf")
+            for d in self.data:
+                self.start_price=min(d['open'],self.start_price)
+                self.end_price=max(d['open'],self.end_price)
+            self.data = None
+            price_delta = self.end_price - self.start_price
+            self.start_price -= price_delta * 0.5
+            self.end_price += price_delta * 0.5
+        else:
+            self.start_price=start_price
+            self.end_price=end_price
+        
         super().__init__(uuid, time_frame, height, width, start_date, end_date)
         
 
@@ -57,6 +71,17 @@ class ChartDisplay(Chart):
         if self.pending_uuid:
             self.uuid=self.pending_uuid
             self.pending_uuid=None
+            self.reload()
+            self.start_price=float("inf")
+            self.end_price=-float("inf")
+            for d in self.data:
+                self.start_price=min(d['open'],self.start_price)
+                self.end_price=max(d['open'],self.end_price)
+            self.data = None
+            price_delta = self.end_price - self.start_price
+            self.start_price -= price_delta * 0.5
+            self.end_price += price_delta * 0.5
+
         chart=[dict() for _ in range(self.width-self.place_for_price)]
 
         self.price=round(self.get_current_price(),2)
